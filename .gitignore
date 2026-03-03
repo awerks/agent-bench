@@ -1,0 +1,10 @@
+.env
+runs/
+__pycache__/
+.pytest_cache/
+*.pyc
+intro.*
+thesis.*
+venv
+.venv
+.vscode
