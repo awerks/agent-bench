@@ -1,0 +1,132 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\providecommand{\mytitle}{Security Analysis of High-Permission LLM-Based Agents}
+\providecommand{\myfirstname}{Illia}
+\providecommand{\mylastname}{Shust}
+\providecommand{\myname}{\myfirstname\ \mylastname}
+\providecommand{\mynumber}{30006544}
+\providecommand{\mysupervisor}{Prof. Dr. Markus Wenzel}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\begin{flushright}
+  \includegraphics[scale=0.8]{images/bsc-logo}
+\end{flushright}
+\vspace*{40mm}
+\begin{center}
+  \huge
+  \textbf{\mytitle}
+\end{center}
+\vspace*{4mm}
+\begin{center}
+ \Large by
+\end{center}
+\vspace*{4mm}
+\begin{center}
+  \LARGE
+  \textbf{\myname}
+\end{center}
+\vspace*{20mm}
+\begin{center}
+  \Large
+  Bachelor Thesis \\[2ex]
+  Computer Science
+\end{center}
+\vfill
+\begin{flushleft}
+  \large
+  Submission: \today \hfill Supervisor: \mysupervisor \\
+  \rule{\textwidth}{1pt}
+\end{flushleft}
+\begin{center}
+  School of Computer Science and Engineering, Constructor University
+\end{center}
+
+\newpage
+\thispagestyle{empty}
+
+\begin{center}
+  \Large \textbf{Statutory Declaration}
+  \vspace*{8mm}
+\end{center}
+
+\begin{center}
+  \begin{tabular}{|l|p{85mm}|}
+    \hline
+    Family Name, Given/First Name & \mylastname, \myfirstname \\
+    Matriculation number & \mynumber \\
+    Kind of thesis submitted & Bachelor Thesis \\
+    \hline
+  \end{tabular}
+  \vspace*{8mm}
+\end{center}
+
+\subsection*{English: Declaration of Authorship}
+
+I hereby declare that the thesis submitted was created and written
+solely by myself without any external support. Any sources, direct
+or indirect, are marked as such. I am aware of the fact that the
+contents of the thesis in digital form may be revised with regard to
+usage of unauthorized aid as well as whether the whole or parts of
+it may be identified as plagiarism. I do agree my work to be entered
+into a database for it to be compared with existing sources, where
+it will remain in order to enable further comparisons with future
+theses. This does not grant any rights of reproduction and usage,
+however.
+
+This document was neither presented to any other examination board
+nor has it been published.
+
+\subsection*{German: Erklärung der Autorenschaft (Urheberschaft)}
+
+Ich erkläre hiermit, dass die vorliegende Arbeit ohne fremde Hilfe
+ausschließlich von mir erstellt und geschrieben worden ist. Jedwede
+verwendeten Quellen, direkter oder indirekter Art, sind als solche
+kenntlich gemacht worden. Mir ist die Tatsache bewusst, dass der
+Inhalt der Thesis in digitaler Form geprüft werden kann im Hinblick
+darauf, ob es sich ganz oder in Teilen um ein Plagiat handelt. Ich
+bin damit einverstanden, dass meine Arbeit in einer Datenbank
+eingegeben werden kann, um mit bereits bestehenden Quellen
+verglichen zu werden und dort auch verbleibt, um mit zukünftigen
+Arbeiten verglichen werden zu können. Dies berechtigt jedoch nicht
+zur Verwendung oder Vervielfältigung.
+
+Diese Arbeit wurde noch keiner anderen Prüfungsbehörde vorgelegt
+noch wurde sie bisher veröffentlicht.
+
+\vspace{20mm}
+
+\dotfill\\
+Date, Signature
+
+\newpage
+
+\begin{abstract}
+Increasingly, Large language model (LLM) systems occupy roles as agents that perform
+more than question-answering. They read documents, browse websites, call tools, modify files,
+and interact via enterprise APIs. This changes the security problem; to be useful, the agent must
+have extended permissions, e.g read untrusted websites, email, documents, tool output, and memory. The relatively new threat of prompt injection arises from the LLM's failure to cleanly sep-
+arate trusted instructions from attacker-controlled text. When it fails, the model extracts sen-
+sitive information, misuses enterprise or tool resources, or even acts as an adversary over multi-
+step interactions. We study the attack surface of these high-permission LLM agents and how
+both permission design and defense-in-depth impact the tradeoff between utility and security.
+We adapt and verify the results of the ReAct methodology for analyzing the security of text-based
+agents, specifying the test environment for reproduction, and conducting new experiments to
+explore the mitigation space.
+
+A high-permission LLM agent is examined using ReAct test-bed, a controllable environment where we apply the attacker capability to write and read files,
+generate and read email, calendar, and ticketing entires, and interact over a memory interface.
+The ways our attacker interacts with the system match the ways an adversary
+seeking to export sensitive information, evade unobserved writing restrictions, or add a persistent memory payload would do so. The testbed reproducing the study is published open-source\footnote{\url{https://github.com/awerks/agent-bench}} to help additional experiments. The results show how different tooling,
+permissions, and systems development choices can protect agents in this threat environment.
+We find that high permission LLM agents are best considered confusable deputies\footnote{\url{https://en.wikipedia.org/wiki/Confused_deputy_problem}} and a layered
+set of defenses provide the best outcomes for these agents.
+\end{abstract}
+
+\tableofcontents
+
+\end{document}
