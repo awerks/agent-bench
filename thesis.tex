@@ -1,6 +1,161 @@
 \documentclass[11pt,a4paper]{report}
-\usepackage{graphicx}
+
+\usepackage[margin=2.7cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\IfFileExists{phvr8t.tfm}{\usepackage{helvet}}{\usepackage{lmodern}}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[protrusion=true,expansion=false]{microtype}
 \usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.65em}
+\renewcommand{\bibname}{References}
+
+\newcommand{\asr}{\mathrm{ASR}}
+\newcommand{\btsr}{\mathrm{BTSR}}
+
+\definecolor{agentBlue}{HTML}{2F80ED}
+\definecolor{appOrange}{HTML}{F2994A}
+\definecolor{attackerRed}{HTML}{EB5757}
+\definecolor{safeGreen}{HTML}{219653}
+\definecolor{observationBlue}{HTML}{2F80ED}
+\definecolor{keyMessageYellow}{HTML}{F4D03F}
+\definecolor{messageOrange}{HTML}{F97316}
+\definecolor{panelGray}{HTML}{F5F7FA}
+\definecolor{lineGray}{HTML}{6B7280}
+\definecolor{codeGreen}{HTML}{148A2A}
+\definecolor{codeBlue}{HTML}{1D4ED8}
+\definecolor{codeRed}{HTML}{B91C1C}
+\definecolor{codeBg}{HTML}{FBFBFB}
+
+\lstdefinestyle{mcpdesc}{
+  language=Python,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{codeBlue}\bfseries,
+  stringstyle=\color{codeGreen},
+  commentstyle=\color{lineGray},
+  identifierstyle=\color{black},
+  numbers=left,
+  numberstyle=\tiny\color{lineGray},
+  numbersep=7pt,
+  frame=single,
+  rulecolor=\color{lineGray},
+  backgroundcolor=\color{codeBg},
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true,
+  tabsize=2
+}
+
+\tikzset{
+  flowNode/.style={draw=lineGray, very thick, rounded corners=5pt, align=center, text width=2.6cm, minimum height=0.95cm, fill=white},
+  sourceNode/.style={flowNode, fill=panelGray},
+  agentNode/.style={flowNode, fill=agentBlue!10, draw=agentBlue!80},
+  toolNode/.style={flowNode, fill=appOrange!12, draw=appOrange!85},
+  attackerNode/.style={flowNode, fill=attackerRed!10, draw=attackerRed!85},
+  memoryNode/.style={flowNode, fill=safeGreen!10, draw=safeGreen!75},
+  flowArrow/.style={-{Latex[length=2.6mm]}, very thick, draw=lineGray},
+  attackArrow/.style={-{Latex[length=2.6mm]}, very thick, draw=attackerRed},
+  appBox/.style={draw=lineGray, dashed, very thick, rounded corners=9pt, inner sep=9pt},
+  stepDot/.style={circle, text=white, font=\bfseries\scriptsize, minimum size=5.3mm, inner sep=0pt},
+  flowNote/.style={align=left, text width=3.65cm, font=\scriptsize, fill=white, draw=lineGray!35, rounded corners=3pt, inner sep=4.5pt}
+}
+
+\newcommand{\attackflowdiagram}[7]{%
+\begin{tikzpicture}[font=\scriptsize, x=1cm, y=1cm]
+  \node[font=\bfseries\small, anchor=west] at (-0.35,6.15) {#1};
+  \node[flowNote, anchor=north west] at (-0.35,5.85)
+    {\textbf{Injected instruction}\\#4};
+
+  \node[sourceNode] (source) at (0.85,3.35) {#2};
+  \node[attackerNode] (attacker) at (0.85,1.35) {Attacker\\#6};
+  \node[agentNode] (user) at (6.25,4.10) {User\\#3};
+  \node[agentNode] (agent) at (6.25,2.75) {LLM agent\\planner/router};
+  \node[toolNode] (tool) at (6.25,1.35) {#5};
+  \node[appBox, fit=(user)(agent)(tool)] (app) {};
+  \node[font=\scriptsize, fill=white, inner sep=1pt] at (app.south) {LLM-integrated application};
+
+  \draw[attackArrow] (attacker) -- node[stepDot, fill=attackerRed, pos=0.47] {1} (source);
+  \draw[flowArrow] (user) -- node[stepDot, fill=agentBlue, pos=0.50] {2} (agent);
+  \draw[flowArrow] (agent.west) to[bend left=11] node[stepDot, fill=appOrange, pos=0.47] {3} (source.east);
+  \draw[attackArrow] (source.east) to[bend left=11] node[stepDot, fill=attackerRed, pos=0.53] {4} (agent.west);
+  \draw[flowArrow] (agent) -- node[stepDot, fill=appOrange, pos=0.50] {5} (tool);
+  \draw[attackArrow] (tool.west) -- node[stepDot, fill=attackerRed, pos=0.53] {6} (attacker.east);
+
+  \node[flowNote, anchor=north west] at (-0.35,0.05)
+    {\textbf{Boundary to enforce}\\#7};
+\end{tikzpicture}}
+
+\newcommand{\promptdatabox}[3]{%
+\setlength{\fboxsep}{6pt}%
+\noindent\fbox{%
+\begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+\raggedright\small
+\textbf{Prompt (#1)}\par
+\vspace{0.35em}
+\textbf{User prompt}\par
+#2\par
+\vspace{0.55em}\hrule\vspace{0.55em}
+\textbf{Injected data from untrusted source}\par
+#3
+\end{minipage}}}
+
+\newcounter{observation}
+\newcommand{\observationbox}[1]{%
+\refstepcounter{observation}%
+\vspace{0.25em}%
+\noindent\begin{tikzpicture}
+  \node[
+    draw=observationBlue,
+    line width=0.8pt,
+    rounded corners=4pt,
+    fill=observationBlue!10,
+    inner xsep=8pt,
+    inner ysep=6pt,
+    text width=\dimexpr\linewidth-20pt\relax,
+    align=left
+  ] {\textbf{Observation \#\theobservation:} #1};
+\end{tikzpicture}%
+\par\vspace{0.25em}}
+
+\newcounter{keymessage}
+\newcommand{\keymessagebox}[1]{%
+\refstepcounter{keymessage}%
+\vspace{0.25em}%
+\noindent\begin{tikzpicture}
+  \node[
+    draw=keyMessageYellow,
+    line width=1pt,
+    rounded corners=4pt,
+    fill=keyMessageYellow!18,
+    inner xsep=8pt,
+    inner ysep=6pt,
+    text width=\dimexpr\linewidth-20pt\relax,
+    align=left
+  ] {\textbf{Key Message\#\thekeymessage:} #1};
+\end{tikzpicture}%
+\par\vspace{0.25em}}
 
 \providecommand{\mytitle}{Security Analysis of High-Permission LLM-Based Agents}
 \providecommand{\myfirstname}{Illia}
@@ -128,5 +283,4 @@ set of defenses provide the best outcomes for these agents.
 \end{abstract}
 
 \tableofcontents
-
 \end{document}
