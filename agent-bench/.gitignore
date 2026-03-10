@@ -1,0 +1,12 @@
+results/traces/*.jsonl
+results/summary_tables.csv
+results/aggregate.csv
+data/sandbox/*
+!data/sandbox/.gitkeep
+data/memory_poisoning/*.jsonl
+data/tool_outputs/mcp_manifest.json
+*.pyc
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/

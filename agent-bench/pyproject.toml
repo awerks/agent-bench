@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-security-research"
+version = "0.1.0"
+description = "Minimal CLI testbed for high-permission LLM agent security research."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "google-genai>=1.0.0",
+  "mcp>=1.0.0",
+  "pydantic>=2.0.0",
+  "pyyaml>=6.0.0",
+]
+
+[project.scripts]
+asr-agent = "agent.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
