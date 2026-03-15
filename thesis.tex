@@ -298,4 +298,31 @@ Recent incidents and advisories have revealed the shape of these risks. Reuters 
 The attack landscape is also shifting. During this work, simple ``ignore previous instructions'' payloads became less reliable against newer frontier models than against earlier agent prototypes. That matches public hardening efforts. OpenAI describes prompt-injection defense as a major focus that includes training to distinguish trusted from untrusted instructions, monitoring, sandboxing, red teaming, bug-bounty intake, and user confirmations \cite{openaiPromptInjection2026}. OpenAI's 2026 Safety Bug Bounty also treats third-party prompt injection and data exfiltration in agentic products as in-scope when attacker-controlled text can reliably hijack an agent into harmful action or leakage \cite{openaiSafetyBounty2026}. OpenAI has likewise run specialized jailbreak bounty programs, including a biosecurity challenge with a \$25,000 reward for the first true universal jailbreak \cite{openaiBioBugBounty2025}. For this thesis, the takeaway is not that prompt injection has been solved. It is that realistic attacks now have to look like plausible task instructions, validation steps, tool guidance, or memory updates rather than obvious override strings.
 
 \observationbox{Prompt injection is becoming harder to demonstrate with trivial payloads, but the risk is moving toward subtler agentic failures where attacker-controlled data looks like a reasonable intermediate step.}
+
+\section{Problem Statement}
+
+This thesis will examine the security of LLM-based agents that function with delegated permissions while continuously ingesting untrusted content. We imagine the agent comprises a planner LLM, a tool router, an executor, workspace state (persistent or temporary), and external tools or APIs. We imagine that the attacker controls content the agent reads, e.g., a web page, PDF, email, tool output, or memory entry. The attacker should not exploit the operating system, browser, or network. That is not in the scope of this thesis. The attack works by implanting instructions inside content that the agent is likely to process as part of the task.
+
+The primary security failure studied is that the agent follows attacker-controlled instructions as if they were part of the user's goal or the system's policy. We consider two concrete attacker goals:
+
+\begin{itemize}
+  \item \textbf{Data exfiltration}: the agent reveals a planted secret or sensitive workspace value to an unauthorized channel.
+  \item \textbf{Unauthorized action}: the agent invokes a tool or API action that the user did not intend, such as sending a message, creating a ticket, changing a calendar event, or writing to a file.
+\end{itemize}
+
+The real-world design problem is to minimize these failures without making the agent too frustrating for the users. For example, an agent that is too cautious to ever take a dangerous action will also be too cautious to effectively use many tools. An agent that always adds a confirmation step will reduce attack success but grossly increase both missed legitimate task success and user annoyance. An agent that is not allowed to read certain tool outputs for the user will reduce attack success, but also legitimate task success and user satisfaction. This aspect of the evaluation must measure all of these trade-offs. 
+
+\subsection{Research Questions}
+
+The research described in the thesis will answer the following questions.
+
+\textbf{RQ1: What are the vulnerabilities and common high-severity failure modes of high permission agents?}\label{rq1} This question quantifies where common exploit strategies and high-severity failures are happening when an attacker has high-permission workspace access, some fraction of the time that workspace memory is enabled, and the ability to launch tools from the workspace on the agent's behalf.
+
+\textbf{RQ2: How does the maximum feasible attack harm vary with read-only workspace access, workspace memory, and workspace action-capable APIs?}\label{rq2}  This question presents examples of high-permission workspace exploitation and hypothesizes how the examples it presents can be used to develop metrics and strategies for evaluating the value of various design mechanisms. 
+
+\textbf{RQ3: How effective are various mechanisms at reducing workspace attack success and harm?}\label{rq3} For example, confirming actions and adding user input steps reduces the number of user actions that attackers can try to induce. 
+
+\textbf{RQ4: Over what time scale do attacks persist and chain, and what is the effect of workspace disabling on persistence and chaining?}\label{rq4}  If an attacker injects into the memory a goal that the agent cannot directly complete, such as sending an email, how long does the injected goal persist? 
+
+\textbf{RQ5: What is a good high-permission agent design that makes reasonable trade-offs between reducing high-permission workspace attacks, false workspace alarms, added user input steps, missed task completions, degraded tool and workspace performance, tool updates and/or replacements, and system development and deployment costs?}\label{rq5}
 \end{document}
