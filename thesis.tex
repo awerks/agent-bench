@@ -325,4 +325,9 @@ The research described in the thesis will answer the following questions.
 \textbf{RQ4: Over what time scale do attacks persist and chain, and what is the effect of workspace disabling on persistence and chaining?}\label{rq4}  If an attacker injects into the memory a goal that the agent cannot directly complete, such as sending an email, how long does the injected goal persist? 
 
 \textbf{RQ5: What is a good high-permission agent design that makes reasonable trade-offs between reducing high-permission workspace attacks, false workspace alarms, added user input steps, missed task completions, degraded tool and workspace performance, tool updates and/or replacements, and system development and deployment costs?}\label{rq5}
+\section{Central Thesis}
+
+The main argument is that prompt instructions in isolation cannot contain a high-permission LLM agent. As a model that ingests trusted instructions and untrusted content through the same language facility, whatever deploys the model must be prepared and able to contain mistaken or treacherous instructions as best it can. A secure agent design must, therefore, also enforce least privilege at the tool layer, label or otherwise separate untrusted content, validate outputs before taking certain actions based on them, constrain memory, and require user authorization when an action crosses a meaningful privilege boundary. These generally reasonable precautions will not eliminate prompt injection, but they can reduce the expected harm while preserving enough capability for useful tasks.
+
+\keymessagebox{The critical design point is not to make every model answer perfect; it is to ensure that an unsafe answer cannot silently become a privileged action or reveal a secret.}
 \end{document}
