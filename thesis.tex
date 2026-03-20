@@ -330,4 +330,13 @@ The research described in the thesis will answer the following questions.
 The main argument is that prompt instructions in isolation cannot contain a high-permission LLM agent. As a model that ingests trusted instructions and untrusted content through the same language facility, whatever deploys the model must be prepared and able to contain mistaken or treacherous instructions as best it can. A secure agent design must, therefore, also enforce least privilege at the tool layer, label or otherwise separate untrusted content, validate outputs before taking certain actions based on them, constrain memory, and require user authorization when an action crosses a meaningful privilege boundary. These generally reasonable precautions will not eliminate prompt injection, but they can reduce the expected harm while preserving enough capability for useful tasks.
 
 \keymessagebox{The critical design point is not to make every model answer perfect; it is to ensure that an unsafe answer cannot silently become a privileged action or reveal a secret.}
+
+
+\chapter{Background}
+
+\section{LLM-Based Agents}
+
+An LLM-based agent is a system where a language model does more than just give an answer: it also selects the actions it or other components will take in the world. These agents often include a user interface so that the model can ask clarifying questions. The environment is a browser, file system, code interpreter, search API, email, calendar, ticketing system, or other business tool. The agent receives a user's goal, plans a sequence of steps to take in the environment, calls the tool(s), observes their responses, and updates its plan.
+
+A common design pattern is ReAct, short for reasoning and acting. The model does a reasoning step to decide on an action to take with a tool. Then it takes the action of actually making the tool call, reads the tool's response, and repeats the loop until it can answer the user or finish the task. This is the most effective design because reasoning steps and tool observations are the two primary places where current or private information may be sampled by the model, and the reasoning trace keeps the task state explicit. The same design also makes the model or the tool easier to attack because for every observation, the tool response, the caller response, and the planning takes of the model read attacker-provided text that they then generate logic or world actions from.
 \end{document}
