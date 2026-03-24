@@ -345,4 +345,32 @@ A common design pattern is ReAct, short for reasoning and acting. The model does
 Prompt injection is the action of inserting adversarial instructions into the text a large language model (LLM) is reading. An attacker can inject such instructions directly in the prompt supplied by the user, or indirectly, through parasitic instructions in additional content from the web, email, PDF, retrieved document, or tool output. Indirect prompt injection is particularly relevant for agents because they are designed to gather information from external sources and perform actions based on that information.
 
 Prompt injection is unique in that attackers do not exploit a traditional software vulnerability to alter the program's expected behavior. Instead, natural language serves as the control interface. For example, a malicious webpage can include text specifying to the model to disregard previous instructions, leak environment details, or invoke an external tool. A traditional parser would simply interpret the text from the webpage as data, while an LLM might interpret that same text as instructions unless the encompassing environment suppresses or constrains this interpretation.
+
+\section{Security and Usefulness Metrics}
+\label{sec:metrics}
+
+The evaluation uses two primary metrics:
+
+\textbf{Attack Success Rate (ASR)} is the percentage of attack attempts that achieve a defined attacker goal. Separate ASR values should be reported for exfiltration and unauthorized actions because they represent different harm types.
+
+\[
+\asr = \frac{\text{number of successful attacks}}{\text{number of attack attempts}} \times 100
+\]
+
+\textbf{Benign Task Success Rate (BTSR)} is the percentage of normal, non-adversarial tasks completed correctly. BTSR is necessary because a defense that blocks every tool call may reduce ASR, but it may also destroy the agent's usefulness.
+
+\[
+\btsr = \frac{\text{number of correctly completed benign tasks}}{\text{number of benign task attempts}} \times 100
+\]
+
+Additional metrics include:
+
+\begin{itemize}
+  \item \textbf{False positive rate}: benign actions blocked or flagged as malicious.
+  \item \textbf{False negative rate}: malicious actions allowed or missed.
+  \item \textbf{Steps to compromise}: number of agent steps before attacker goal success.
+  \item \textbf{Added user steps}: number of confirmations or manual interventions.
+  \item \textbf{Latency}: wall-clock time per run.
+  \item \textbf{Persistence rate}: percentage of attacks that create durable malicious memory.
+\end{itemize}
 \end{document}
