@@ -373,4 +373,61 @@ Additional metrics include:
   \item \textbf{Latency}: wall-clock time per run.
   \item \textbf{Persistence rate}: percentage of attacks that create durable malicious memory.
 \end{itemize}
+
+\chapter{Attack}
+\section{Prompt injection types}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[font=\scriptsize, node distance=0.75cm and 0.95cm]
+  \tikzset{
+    typeHub/.style={draw=lineGray, rounded corners=7pt, fill=panelGray, align=center, text width=3.05cm, minimum height=1.15cm, inner xsep=8pt, inner ysep=7pt, font=\bfseries},
+    typeCard/.style={draw=lineGray, rounded corners=6pt, fill=white, align=left, text width=4.2cm, minimum height=2.0cm, inner xsep=8pt, inner ysep=7pt},
+    directCard/.style={typeCard, draw=attackerRed!75, fill=attackerRed!6},
+    indirectCard/.style={typeCard, draw=agentBlue!75, fill=agentBlue!6},
+    toolCard/.style={typeCard, draw=appOrange!85, fill=appOrange!10},
+    memoryCard/.style={typeCard, draw=safeGreen!75, fill=safeGreen!8},
+    typeArrow/.style={-{Latex[length=2.2mm]}, draw=lineGray!85, thick},
+    typeLabel/.style={font=\tiny\bfseries, text=lineGray, fill=white, draw=lineGray!35, rounded corners=2pt, inner xsep=3pt, inner ysep=1.5pt}
+  }
+
+  \node[typeHub] (hub) {Prompt\\injection\\entry point};
+
+  \node[directCard, above left=0.75cm and 1.05cm of hub] (direct)
+    {\textbf{Direct prompt injection}\\
+    Malicious instruction is placed in the user-controlled prompt itself.\par\vspace{0.35em}
+    \textit{Typical test:} ask directly for a system prompt.};
+
+  \node[indirectCard, above right=0.75cm and 1.05cm of hub] (indirect)
+    {\textbf{Indirect content injection}\\
+    Malicious instruction is embedded in content the agent retrieves.\par\vspace{0.35em}
+    \textit{Sources:} web pages, email, PDFs, scraped documents.};
+
+  \node[toolCard, below left=0.75cm and 1.05cm of hub] (tool)
+    {\textbf{Tool-output / MCP injection}\\
+    Malicious instruction appears after a tool call, often as output or a tool descriptor.\par\vspace{0.35em}
+    \textit{Risk:} tool output authorizes a new action.};
+
+  \node[memoryCard, below right=0.75cm and 1.05cm of hub] (memory)
+    {\textbf{Memory poisoning}\\
+    Malicious instruction is written into durable agent state and may trigger later.\par\vspace{0.35em}
+    \textit{Risk:} delayed compromise across sessions.};
+
+  \draw[typeArrow] (hub.north west) -- (direct.south east);
+  \draw[typeArrow] (hub.north east) -- (indirect.south west);
+  \draw[typeArrow] (hub.south west) -- (tool.north east);
+  \draw[typeArrow] (hub.south east) -- (memory.north west);
+
+  \node[typeLabel] at ($(hub.north west)!0.46!(direct.south east) + (-0.05,0.22)$) {user};
+  \node[typeLabel] at ($(hub.north east)!0.46!(indirect.south west) + (0.10,0.22)$) {retrieval};
+  \node[typeLabel] at ($(hub.south west)!0.48!(tool.north east) + (-0.08,-0.23)$) {tool};
+  \node[typeLabel] at ($(hub.south east)!0.48!(memory.north west) + (0.10,-0.23)$) {state};
+
+  \node[draw=lineGray!45, rounded corners=5pt, fill=panelGray!45, align=center, text width=10.6cm, below=1.05cm of tool.south east, xshift=2.75cm]
+    {All four cases exploit the same weakness: the model reads attacker-controlled text in a language channel that can look like task instructions.};
+\end{tikzpicture}
+\caption{Prompt-injection types by entry point.}
+\label{fig:prompt-injection-types}
+\end{figure}
+
+Hidden text isn't always apparent in the rendered text, HTML source, or PDF content. Instructions may be inscribed anywhere, such as raw HTML nodes, CSS style invisible text, white-on-white or tiny text, Unicode tag characters, zero-width characters, variation selectors, Base64 or hex strings, ROT13 or Caesar-style ciphers, emoji sequences, and any other markup or representation that instructions still interpret after extraction and rendering. OWASP explicitly lists hidden text, Base64, hex, Unicode smuggling, and invisible rendering tricks as prompt-injection obfuscation patterns. Recent work also shows that invisible Unicode variation selectors, emoji representations, and encoded or ciphered prompts can bypass safety mechanisms or change model behavior without looking like ordinary malicious prose to a human reviewer \cite{owaspPromptInjectionCheatSheet,imperceptibleJailbreak2025,emojiJailbreak2026,weiJailbroken2023}. Defenses should, therefore, examine raw and rendered content, normalize Unicode, decode common encoding where possible, store document metadata in traces, and consider any decoded or extracted text as untrustworthy data, not as an authority for the execution of new operations.
 \end{document}
