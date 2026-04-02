@@ -675,4 +675,37 @@ Hidden text isn't always apparent in the rendered text, HTML source, or PDF cont
 \end{figure}
 
 \clearpage
+
+
+
+\chapter{Agent Testbed Design}
+
+
+
+
+\section{Permission Model}
+
+The agent's permissions are configured per experiment. Table~\ref{tab:permissions} summarizes the permission levels.
+
+\begin{table}[h]
+\centering
+\caption{Permission levels used in the evaluation.}
+\label{tab:permissions}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Level} & \textbf{Allowed capability} \\
+\midrule
+P0 & Text-only responses, no external tools \\
+P1 & Read public web pages and public documents \\
+P2 & Read private workspace files and mock internal data \\
+P3 & Write or modify workspace files \\
+P4 & Call action-capable mock APIs such as email, calendar, or ticketing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+This model supports RQ2 by letting the same attack payload be evaluated under different authority levels.
+
+\keymessagebox{Permission level changes the harm of the same prompt injection. At P2 it can become a confidentiality breach; at P3 it can persist state; at P4 it can trigger external workflow actions.}
+
 \end{document}
