@@ -708,4 +708,22 @@ This model supports RQ2 by letting the same attack payload be evaluated under di
 
 \keymessagebox{Permission level changes the harm of the same prompt injection. At P2 it can become a confidentiality breach; at P3 it can persist state; at P4 it can trigger external workflow actions.}
 
+\section{Design Goals}
+
+
+The implemented testbed, which can be found in the \texttt{agent-bench} repository  \cite{agentBenchRepo}, is small enough to be reproduced but realistic enough to  stress the security properties of high-permission agents. It supports repeatable tasks, configurable permissions, mock sensitive data, controlled adversarial fixtures, layered defenses, and trace logging. The goal is not to build the most capable possible agent. The goal is to build an environment where agent security can be evaluated in a controlled way.
+\section{Architecture}
+
+The agent makes use of a ReAct style loop with a Gemini planner. Its components are as follows
+
+\begin{itemize}
+  \item Planner LLM: converts tasks, tools, observations, and policy history into JSON decisions.
+  \item Tool router: applies permissions and allowlists, and rejects undeclared fixture arguments (available tools: \texttt{read\_file}, \texttt{write\_file}, \texttt{fetch\_url}, \texttt{read\_pdf}, \texttt{search}, \texttt{send\_email}, \texttt{create\_calendar\_event}, \texttt{create\_ticket}, \texttt{memory\_read}, \texttt{memory\_write}).
+  \item Executor: runs approved calls in a sandbox and labels observations by source.
+  \item Mock APIs: emulate email, calendar, ticketing, web, PDF, and search.
+  \item Memory store: persists known facts, which are read after memory-gate checks
+  \item Policy layer: enforces allowlists, confirmations, validation, labeling, and quarantine.
+  \item Logger: logs prompts, decisions, outcomes, observations, confirmations, answers, and scores.
+\end{itemize}
+
 \end{document}
