@@ -726,4 +726,71 @@ The agent makes use of a ReAct style loop with a Gemini planner. Its components 
   \item Logger: logs prompts, decisions, outcomes, observations, confirmations, answers, and scores.
 \end{itemize}
 
+\section{Execution Loop}
+
+Each task run follows the same controlled loop:
+
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\scriptsize, x=1cm, y=1cm]
+  \tikzset{
+    seqNode/.style={draw=lineGray, rounded corners=3pt, fill=panelGray, inner xsep=5pt, inner ysep=3pt, align=center},
+    lifeline/.style={draw=lineGray!60, dashed},
+    msg/.style={-{Latex[length=2.2mm]}, draw=lineGray, thick}
+  }
+
+  \node[seqNode] (runner) at (0,0) {Runner};
+  \node[seqNode] (sandbox) at (2.8,0) {Sandbox};
+  \node[seqNode] (planner) at (5.6,0) {Planner};
+  \node[seqNode] (policy) at (8.4,0) {Policy};
+  \node[seqNode] (tools) at (11.2,0) {Tools};
+  \node[seqNode] (scorer) at (14.0,0) {Scorer};
+
+  \draw[lifeline] (runner.south) -- ++(0,-7.6);
+  \draw[lifeline] (sandbox.south) -- ++(0,-7.6);
+  \draw[lifeline] (planner.south) -- ++(0,-7.6);
+  \draw[lifeline] (policy.south) -- ++(0,-7.6);
+  \draw[lifeline] (tools.south) -- ++(0,-7.6);
+  \draw[lifeline] (scorer.south) -- ++(0,-7.6);
+
+  \path (runner.south) ++(0,-0.7) coordinate (r1);
+  \path (sandbox.south) ++(0,-0.7) coordinate (s1);
+  \draw[msg] (r1) -- node[above, align=center] {Init environment\\seed fixtures} (s1);
+
+  \path (runner.south) ++(0,-1.6) coordinate (r2);
+  \path (planner.south) ++(0,-1.6) coordinate (p2);
+  \draw[msg] (r2) -- node[above, align=center] {Provide task\\and tools} (p2);
+
+  \path (planner.south) ++(0,-2.5) coordinate (p3);
+  \path (runner.south) ++(0,-2.5) coordinate (r3);
+  \draw[msg] (p3) -- node[above, align=center] {Decision: tool\\or final} (r3);
+
+  \path (runner.south) ++(0,-3.4) coordinate (r4);
+  \path (policy.south) ++(0,-3.4) coordinate (po4);
+  \draw[msg] (r4) -- node[above] {Validate decision} (po4);
+
+  \path (policy.south) ++(0,-4.3) coordinate (po5);
+  \path (runner.south) ++(0,-4.3) coordinate (r5);
+  \draw[msg] (po5) -- node[above] {Allow / block} (r5);
+
+  \path (runner.south) ++(0,-5.2) coordinate (r6);
+  \path (tools.south) ++(0,-5.2) coordinate (t6);
+  \draw[msg] (r6) -- node[above, align=center] {Execute tool\\if allowed} (t6);
+
+  \path (tools.south) ++(0,-6.1) coordinate (t7);
+  \path (runner.south) ++(0,-6.1) coordinate (r7);
+  \draw[msg] (t7) -- node[above] {Observation} (r7);
+
+  \path (runner.south) ++(0,-7.0) coordinate (r8);
+  \path (planner.south) ++(0,-7.0) coordinate (p8);
+  \draw[msg] (r8) -- node[above, align=center] {Repeat until final\\or max steps} (p8);
+
+  \path (runner.south) ++(0,-7.9) coordinate (r9);
+  \path (scorer.south) ++(0,-7.9) coordinate (s9);
+  \draw[msg] (r9) -- node[above] {Score run} (s9);
+\end{tikzpicture}
+\caption{Sequence diagram of the execution loop.}
+\label{fig:execution-loop-sequence}
+\end{figure}
 \end{document}
