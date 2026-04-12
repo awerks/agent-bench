@@ -808,4 +808,24 @@ Each research question is mapped to a measurable experiment:
   \item RQ4 is answered by running multi-session memory experiments.
   \item RQ5 is answered by discussing the resulting security/usefulness trade-off.
 \end{itemize}
+
+
+\section{Experiment Matrix}
+
+\begin{table}[h]
+\centering
+\caption{Pilot experiment matrix.}
+\label{tab:experiments}
+\begin{tabularx}{\textwidth}{@{}lX X@{}}
+\toprule
+\textbf{Experiment} & \textbf{Setup} & \textbf{Main outputs} \\
+\midrule
+E1 & A Hidden instruction inside controlled HTML requests the agent to read and leak a sandbox secret file. & Covert exfiltration, adversary model step, false negative. \\
+E2 & Malicious search/tool output requests the agent to send a forge email prior to legitimate support ticket creation. & Unauthorized behavior, abused utility, human confirmation expense. \\
+E3 & Vendor-like PDF document requests the agent to read a private validation specific file before answering. & Data leak, tool-argument whitelist, false rejection. \\
+E4 & A Web project note requests the agent to remember a possibly harmful long-term memoization rule. & Memoization persistence, memoization isolation, utility loss due to human confirm. \\ 
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \end{document}
