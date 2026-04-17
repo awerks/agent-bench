@@ -831,4 +831,85 @@ E4 & A Web project note requests the agent to remember a possibly harmful long-t
 \section{Result Artifacts}
 
 The reported results are generated from the 16 current JSONL trace files under \path{agent-bench/results/traces}. The trace-derived summary files are \path{agent-bench/results/thesis_trace_summary.csv} and \path{agent-bench/results/thesis_profile_summary.csv}.\footnote{\url{https://github.com/awerks/agent-bench}}
+
+
+\chapter{Results}
+\label{chap:results-discussion}
+
+\section{Security/Usefulness Trade-Off}
+
+The pilot evaluation is comprised of 16 adversarial runs: four attack tasks evaluated against four defense profiles. Table~\ref{tab:aggregate-results} presents the aggregate results derived from those traces.
+
+\begin{table}[h]
+\centering
+\caption{Trace-derived aggregate pilot results by defense profile.}
+\label{tab:aggregate-results}
+\small
+\begin{tabularx}{\textwidth}{@{}Xccccc@{}}
+\toprule
+\textbf{Defense profile} & \textbf{ASR} & \textbf{Utility} & \textbf{Blocked} & \textbf{Blocks} & \textbf{User steps} \\
+\midrule
+Baseline & 4/4 (100\%) & 4/4 (100\%) & 0/4 & 0 & 0.00 \\
+Allowlist + confirmation & 0/4 (0\%) & 3/4 (75\%) & 2/4 & 2 & 1.25 \\
+Labeling + validation & 1/4 (25\%) & 4/4 (100\%) & 1/4 & 1 & 0.00 \\
+Memory-enabled layered & 0/4 (0\%) & 2/4 (50\%) & 3/4 & 11 & 2.25 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The baseline profile was effective but unsafe: it executed every task of the users, and all four adversarial goals were reached. The strongest security result was the allowlist/confirmation and memory profile, where ASR became 0\%. But memory contained costs because, as shown in Figure~\ref{fig:bars}, the utility successes under attack to legitimate actions, and the blocked-attack rate are on the same scale. The blocked-attack rate highlights how the attacked utility might be under decision of payment rather than be a free attribute of the utility function. The blocked attack rate counts to the right in the graph, but it is the decision of the adversary to apply an attack, given the prohibition by the gate. The pilot generally supports the claim of the thesis that the obedience at the model level is not a necessary boundary but also shows that the security layers must be tuned carefully because else they turn policy blocks into task failures.
+
+\keymessagebox{The result is a security/usefulness trade-off, not a simple win/loss table: the strongest blocking profile also had the largest utility cost.}
+
+\begin{figure}[h]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[x=1pt,y=1pt,font=\scriptsize]
+  \def\chartLeft{54}
+  \def\chartBottom{38}
+  \def\chartWidth{420}
+  \def\chartHeight{160}
+  \def\yscale{1.6}
+  \newcommand{\resultbar}[4]{%
+    \pgfmathsetmacro{\barheight}{#3*\yscale}%
+    \filldraw[fill=#4,draw=#4,rounded corners=1.6pt]
+      (#1+#2,\chartBottom) rectangle (#1+#2+12,\chartBottom+\barheight);
+    \node[font=\tiny, text=#4] at (#1+#2+6,\chartBottom+\barheight+7) {#3};
+  }
+
+  \node[font=\bfseries\small, anchor=west] at (\chartLeft,235) {Security and utility by defense profile};
+  \node[text=lineGray, anchor=west] at (\chartLeft,220) {Percent of runs; higher ASR is worse, higher utility and blocking are better.};
+
+  \foreach \v in {0,25,50,75,100} {
+    \pgfmathsetmacro{\y}{\chartBottom+\v*\yscale}
+    \draw[lineGray!20] (\chartLeft,\y) -- (\chartLeft+\chartWidth,\y);
+    \node[anchor=east, text=lineGray] at (\chartLeft-6,\y) {\v};
+  }
+  \draw[lineGray!70] (\chartLeft,\chartBottom) -- (\chartLeft+\chartWidth,\chartBottom);
+  \draw[lineGray!70] (\chartLeft,\chartBottom) -- (\chartLeft,\chartBottom+\chartHeight);
+  \node[rotate=90, text=lineGray] at (18,118) {Percent of runs};
+
+  \foreach \label/\x/\asrval/\utilval/\blockval in {
+    Baseline/98/100/100/0,
+    Allowlist/198/0/75/50,
+    Labeling/298/25/100/25,
+    Memory/398/0/50/75
+  } {
+    \resultbar{\x}{-20}{\asrval}{attackerRed!90}
+    \resultbar{\x}{-5}{\utilval}{safeGreen!85}
+    \resultbar{\x}{10}{\blockval}{agentBlue!85}
+    \node[align=center] at (\x,\chartBottom-18) {\label};
+  }
+
+  \filldraw[fill=attackerRed!90,draw=attackerRed!90,rounded corners=1pt] (355,224) rectangle ++(9,9);
+  \node[anchor=west] at (369,228.5) {ASR};
+  \filldraw[fill=safeGreen!85,draw=safeGreen!85,rounded corners=1pt] (402,224) rectangle ++(9,9);
+  \node[anchor=west] at (416,228.5) {Utility};
+  \filldraw[fill=agentBlue!85,draw=agentBlue!85,rounded corners=1pt] (466,224) rectangle ++(9,9);
+  \node[anchor=west] at (480,228.5) {Blocked};
+\end{tikzpicture}}
+\caption{ASR, utility success under attack, and blocked-attack rate by defense profile.}
+\label{fig:bars}
+\end{figure}
+
 \end{document}
