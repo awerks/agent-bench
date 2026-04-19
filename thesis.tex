@@ -912,4 +912,8 @@ The baseline profile was effective but unsafe: it executed every task of the use
 \label{fig:bars}
 \end{figure}
 
+\section{Interpreting Permission Effects}
+
+The agent uses P2, P3, and P4 permissions. In P2, the E1 and E3 tasks have confidentiality problems: private read permission is used in the baseline to leak the validation information planted. The memory task for P3 has a persistence problem: in the baseline, memory writing is allowed to be poisoned in the labeling-validation hints. The P4 task has a problem with an action: the agent in the baseline attempted the malicious notification step indicated in the tool output and successfully completed the ticket task anyway.
+
 \end{document}
