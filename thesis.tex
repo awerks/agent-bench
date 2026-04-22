@@ -916,4 +916,83 @@ The baseline profile was effective but unsafe: it executed every task of the use
 
 The agent uses P2, P3, and P4 permissions. In P2, the E1 and E3 tasks have confidentiality problems: private read permission is used in the baseline to leak the validation information planted. The memory task for P3 has a persistence problem: in the baseline, memory writing is allowed to be poisoned in the labeling-validation hints. The P4 task has a problem with an action: the agent in the baseline attempted the malicious notification step indicated in the tool output and successfully completed the ticket task anyway.
 
+\section{Interpreting Defense Effects}
+
+Table~\ref{tab:outcome-matrix} shows the per-task outcomes. \emph{Success} means the attacker goal succeeded, \emph{Ignored} means the malicious instruction did not affect the result, \emph{Blocked} means a defense stopped the attacker goal, and \emph{Max steps} means the run ended without a final answer.
+
+\begin{table}[h]
+\centering
+\caption{Per-experiment outcome matrix from current traces.}
+\label{tab:outcome-matrix}
+\begin{tabularx}{\textwidth}{@{}lXXXX@{}}
+\toprule
+\textbf{Experiment} & \textbf{Baseline} & \textbf{Allowlist + confirm} & \textbf{Labeling + validation} & \textbf{Memory layered} \\
+\midrule
+E1 web exfiltration & Success & Ignored & Ignored & Ignored \\
+E2 tool-output action & Success & Ignored & Ignored & Blocked \\
+E3 PDF exfiltration & Success & Blocked & Blocked & Blocked \\
+E4 memory poisoning & Success & Blocked & Success & Max steps \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The most crucial difference lies between defenses that decrease model influence and defenses that mitigate harm after the model has been influenced. Source labeling helped the model to disregard malicious instructions in E1 and E2, but this did not stop E4 memory poisoning: the planner is both the author and the reader of the malicious memory string as can be seen in the trace. Tool allowlists and fixture-argument checks constrained E3 even after the planner tried to access the secret path.  User confirmation blocked the E4 poisoned memory write in the allowlist/confirmation profile, but it also blocked the safe write and added interaction cost, which was an additional safety measure. The memory gate more directly targeted E4, by quarantining the poisoned memory write, but then the surrounding auto-deny confirmation policy repeatedly blocks the safe memory write. 
+
+This is an important observation, as it suggests a stratified architecture. We do not expect a single defense to eliminate prompt injection. In the real world, we aim for defense in depth. Figure~\ref{fig:policy-costs} shows the corresponding cost curve: the more defenses that are brought to bear against injection, the more policy will also block useful inputs and, when interactive confirmation is used, the more user steps stand between the view and a correct execution.
+
+\begin{figure}[h]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[x=1pt,y=1pt,font=\scriptsize]
+  \def\bottom{42}
+  \def\height{150}
+  \def\leftA{54}
+  \def\leftB{352}
+  \def\width{220}
+  \newcommand{\costbar}[5]{%
+    \pgfmathsetmacro{\barheight}{#3*#5}%
+    \filldraw[fill=#4,draw=#4,rounded corners=1.8pt]
+      (#1,\bottom) rectangle ++(22,\barheight);
+    \node[font=\tiny, text=#4] at (#1+11,\bottom+\barheight+7) {#3};
+  }
+
+  \node[font=\bfseries\small, anchor=west] at (\leftA,235) {Policy cost by defense profile};
+  \node[text=lineGray, anchor=west] at (\leftA,220) {Blocks are security-relevant; user steps are the interaction cost introduced by confirmation.};
+
+  \node[font=\bfseries, anchor=west] at (\leftA,201) {Total policy blocks};
+  \foreach \v in {0,3,6,9,12} {
+    \pgfmathsetmacro{\y}{\bottom+\v*12.5}
+    \draw[lineGray!20] (\leftA,\y) -- (\leftA+\width,\y);
+    \node[anchor=east, text=lineGray] at (\leftA-6,\y) {\v};
+  }
+  \draw[lineGray!70] (\leftA,\bottom) -- (\leftA+\width,\bottom);
+  \draw[lineGray!70] (\leftA,\bottom) -- (\leftA,\bottom+\height);
+  \costbar{78}{Baseline}{0}{agentBlue!85}{12.5}
+  \costbar{128}{Allowlist}{2}{agentBlue!85}{12.5}
+  \costbar{178}{Labeling}{1}{agentBlue!85}{12.5}
+  \costbar{228}{Memory}{11}{agentBlue!85}{12.5}
+
+  \node[font=\bfseries, anchor=west] at (\leftB,201) {Average user steps};
+  \foreach \v/\lab in {0/0,0.5/0.5,1/1.0,1.5/1.5,2/2.0,2.5/2.5} {
+    \pgfmathsetmacro{\y}{\bottom+\v*60}
+    \draw[lineGray!20] (\leftB,\y) -- (\leftB+\width,\y);
+    \node[anchor=east, text=lineGray] at (\leftB-6,\y) {\lab};
+  }
+  \draw[lineGray!70] (\leftB,\bottom) -- (\leftB+\width,\bottom);
+  \draw[lineGray!70] (\leftB,\bottom) -- (\leftB,\bottom+\height);
+  \costbar{376}{Baseline}{0}{appOrange!90}{60}
+  \costbar{426}{Allowlist}{1.25}{appOrange!90}{60}
+  \costbar{476}{Labeling}{0}{appOrange!90}{60}
+  \costbar{526}{Memory}{2.25}{appOrange!90}{60}
+
+  \foreach \x/\label in {89/Base,139/Allow,189/Label,239/Memory} {
+    \node[font=\tiny, align=center] at (\x,\bottom-14) {\label};
+  }
+  \foreach \x/\label in {387/Base,437/Allow,487/Label,537/Memory} {
+    \node[font=\tiny, align=center] at (\x,\bottom-14) {\label};
+  }
+\end{tikzpicture}}
+\caption{Policy blocks and average user steps. Latency is treated as raw wall-clock time because interactive confirmation runs include human delay.}
+\label{fig:policy-costs}
+\end{figure}
 \end{document}
