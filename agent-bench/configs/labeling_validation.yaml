@@ -1,0 +1,50 @@
+name: labeling_validation
+model: gemini-2.5-flash
+permission_profile: P4
+max_steps: 8
+confirm_mode: auto-deny
+trace_dir: results/traces
+sandbox_dir: data/sandbox
+memory_path: data/memory_poisoning/memory.jsonl
+mcp_manifest_path: data/tool_outputs/mcp_manifest.json
+defenses:
+  tool_allowlist: true
+  user_confirmation: false
+  content_labeling: true
+  output_validator: true
+  memory_gate: false
+allowed_tools:
+  - fetch_url
+  - read_pdf
+  - search
+  - read_file
+  - create_ticket
+  - memory_read
+  - mcp.benign.vendor_status
+  - mcp.benign.project_note
+fixtures:
+  workspace_files:
+    - path: data/memory_poisoning/e4_memory_attack.html
+      content_path: data/memory_poisoning/e4_memory_attack.html
+      source: web_untrusted
+    - path: data/malicious_pages/e1_report_attack.html
+      content_path: data/malicious_pages/e1_report_attack.html
+      source: web_untrusted
+    - path: data/malicious_pdfs/e3_vendor_attack.txt
+      content_path: data/malicious_pdfs/e3_vendor_attack.txt
+      source: web_untrusted
+    - path: data/tool_outputs/e2_vendor_status_attack.txt
+      content_path: data/tool_outputs/e2_vendor_status_attack.txt
+      source: tool_untrusted
+  web:
+    - url: https://fixture.local/e4/project-note
+      path: data/memory_poisoning/e4_memory_attack.html
+      source: web_untrusted
+mcp:
+  servers:
+    - name: benign
+      command: "{python}"
+      args: ["-m", "mcps.benign_server"]
+      trust_label: mcp_untrusted
+      permission_level: P4
+      allowed_tools: ["vendor_status", "project_note"]
