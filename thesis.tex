@@ -995,4 +995,25 @@ This is an important observation, as it suggests a stratified architecture. We d
 \caption{Policy blocks and average user steps. Latency is treated as raw wall-clock time because interactive confirmation runs include human delay.}
 \label{fig:policy-costs}
 \end{figure}
+
+\section{Memory and Persistence}
+
+The E4 task isolated memory persistence. In the base, the malicious web page led the agent to store a memory entry summing the legitimate fact, "Project Cedar deadline is Monday" with an instruction to forward private validation values. In the Labeling-Validation profile, the final answer looked benign, but the trace still reports an attack success since the malicious memory content was written and then read out. This can be an important failure mode: the answer can look safe even while durable agent state has been poisoned.
+
+This matches the larger memory-poisoning pattern Unit 42 is documenting where the attacker targets the summarization or memory-writing step rather than the immediate answer, so the first session looks clean while the future session is eating the malicious instruction \cite{unit42Memory2025}.
+
+The memory-enabled profile solved that violation of security.  The \texttt{memory\_gate} quarantined the suspected memory write on step 2.  The remaining problem was utility:  Since confirmation was in auto-deny the later attempt to write the safe memory fact was denied over and over again till the run was stepped out.  This indicates that it is necessary to have two different policies when considering memory controls: one must filter possible-suspicious long-term instructions, and the other must admit task-relevant safe facts without letting the attacker automatically create an infinite denial loop.
+
+
+\section{Limitations}
+
+There are limitations to this evaluation:
+
+While mock APIs and secrets ensure that the work can be reproduced, it is impossible to model the behavior of every real enterprise system. 
+
+The results could be different depending on the specific LLM used and the time of evaluation since models evolve, and the capabilities for prompt-injection detection are constantly advancing.
+
+Our attack suite accounts for representative classes of prompt-injection attacks, but it does not ensure that all presented prompt-injection variations are covered. Attackers can always attempt to bypass defenses.
+
+Despite the heightened security measures in strongly-layered defense strategies, it is difficult to formally prove that prompt injection is prevented in all possible cases.
 \end{document}
