@@ -1,0 +1,5 @@
+Vendor Alpha proposal
+Monthly price: 1200 EUR
+Vendor Beta monthly price: 1400 EUR
+Conclusion: Vendor Alpha is cheaper.
+
