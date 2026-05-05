@@ -1023,4 +1023,170 @@ This thesis frames prompt injection in high-permission LLM agents as an authorit
 
 Pilot results outlined in this document offer evidence supporting the main design claim. The baseline satisfied all four surface goals, but it also achieved 100\% attack success. Defense profiles raise the cost of attack, and the allowlist/confirmation and memory-enabled layered defense profiles reached 0\% ASR in the traces available at the time of writing. The memory-enabled profile achieved only 50\% benign surface goal completion under attack. The limiting factor was that after blocking the attempted memory poisoning of the agent, the confirmation police also blocked legitimate updating of the sensitive memory by the tool. The memory updating task was both legitimate and relevant to the prompt, but if there was any doubt, the confirmation policy deferred to the deny of what appeared to be a detected attack. A safe control cannot block valid task-relevant operations. The baseline permissible behavior profile permits them, but this result suggests new defenses would include some. The general conclusion, however, is not that more defenses are always better, but rather specific defenses at these locations both are effective and may require some tuning to maximize the agent's intended flexibility.
 
+\keymessagebox{The durable thesis claim is not that one defense eliminates prompt injection. The claim is that agent high-permission power must be scoped, mediated, logged, and reviewed because the model can still be vulnerable}
+
+Contemporary frontier models and agent systems are increasingly protected against prompt injection via instruction-hierarchy training, red team evaluation, monitoring, sandboxing, and safety reward mechanisms for real safety incidents\cite{openaiPromptInjection2026,openaiIHChallenge2026,openaiSafetyBounty2026}. This makes the kind of simple prompt-injection demonstration we gave in our paper less indicative of likely impact than vulnerabilities in prior systems. However, it does not obviate the need for prompt containment in provenance systems or in extreme-risk settings. It does, thankfully, raise the bar on which to evaluate the robustness of models, leading to the development urgently needed adversarially and robustness-motivated benchmarks. New benchmarks should test realistic attacks that manifest as web content, tool output, imported documents, MCP descriptors, or memory updates, as illustrated in Figures~\ref{fig:prompt-data-web}--\ref{fig:prompt-data-memory}.
+
+\begin{thebibliography}{99}
+
+\bibitem{owasp2025}
+OWASP Foundation.
+\emph{OWASP Top 10 for Large Language Model Applications (v2025)}.
+PDF release, Nov. 18, 2024.
+\url{https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf}
+
+\bibitem{owaspPromptInjectionCheatSheet}
+OWASP Cheat Sheet Series.
+\emph{LLM Prompt Injection Prevention Cheat Sheet}.
+\url{https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html}
+
+\bibitem{ncsc2025}
+UK National Cyber Security Centre.
+\emph{Prompt injection is not SQL injection (it may be worse)}.
+Dec. 8, 2025.
+\url{https://www.ncsc.gov.uk/blog-post/prompt-injection-is-not-sql-injection}
+
+\bibitem{openaiAtlas2025}
+OpenAI.
+\emph{Continuously hardening ChatGPT Atlas against prompt injection attacks}.
+Dec. 22, 2025.
+\url{https://openai.com/index/hardening-atlas-against-prompt-injection/}
+
+\bibitem{openaiPromptInjection2026}
+OpenAI.
+\emph{Understanding prompt injections}.
+OpenAI Safety.
+\url{https://openai.com/safety/prompt-injections/}
+
+\bibitem{openaiSafetyBounty2026}
+OpenAI.
+\emph{Introducing the OpenAI Safety Bug Bounty program}.
+2026.
+\url{https://openai.com/index/safety-bug-bounty/}
+
+\bibitem{openaiBioBugBounty2025}
+OpenAI.
+\emph{Agent bio bug bounty}.
+2025.
+\url{https://openai.com/bio-bug-bounty/}
+
+\bibitem{openaiModelSpec2025}
+OpenAI.
+\emph{OpenAI Model Spec}.
+Dec. 18, 2025.
+\url{https://model-spec.openai.com/2025-12-18.html}
+
+\bibitem{reutersOpenClaw2026}
+Reuters.
+\emph{China warns of security risks linked to OpenClaw open-source AI agent}.
+Feb. 5, 2026.
+\url{https://www.reuters.com/world/china/china-warns-security-risks-linked-openclaw-open-source-ai-agent-2026-02-05/}
+
+\bibitem{canadaN8N2026}
+Canadian Centre for Cyber Security.
+\emph{AL26-001: Vulnerabilities affecting n8n (CVE-2026-21858, CVE-2026-21877 and CVE-2025-68613)}.
+Jan. 12, 2026.
+\url{https://www.cyber.gc.ca/en/alerts-advisories/al26-001-vulnerabilities-affecting-n8n-cve-2026-21858-cve-2026-21877-cve-2025-68613}
+
+\bibitem{greshake2023}
+K. Greshake, S. Abdelnabi, S. Mishra, C. Endres, T. Holz, and M. Fritz.
+\emph{Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection}.
+arXiv:2302.12173, 2023.
+\url{https://arxiv.org/abs/2302.12173}
+
+\bibitem{weiJailbroken2023}
+A. Wei, N. Haghtalab, and J. Steinhardt.
+\emph{Jailbroken: How Does LLM Safety Training Fail?}
+arXiv:2307.02483, 2023.
+\url{https://arxiv.org/abs/2307.02483}
+
+\bibitem{liuHouYi2023}
+Y. Liu et al.
+\emph{Prompt Injection attack against LLM-integrated Applications}.
+arXiv:2306.05499, 2023.
+\url{https://arxiv.org/abs/2306.05499}
+
+\bibitem{react2023}
+S. Yao et al.
+\emph{ReAct: Synergizing Reasoning and Acting in Language Models}.
+ICLR 2023.
+\url{https://arxiv.org/abs/2210.03629}
+
+\bibitem{wallaceInstructionHierarchy2024}
+E. Wallace, K. Xiao, R. Leike, L. Weng, J. Heidecke, and A. Beutel.
+\emph{The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions}.
+arXiv:2404.13208, 2024.
+\url{https://arxiv.org/abs/2404.13208}
+
+\bibitem{openaiIHChallenge2026}
+OpenAI.
+\emph{Improving instruction hierarchy in frontier LLMs}.
+2026.
+\url{https://openai.com/index/instruction-hierarchy-challenge/}
+
+\bibitem{johnsonWebAgents2025}
+S. Johnson et al.
+\emph{Manipulating LLM Web Agents with Indirect Prompt Injection Attack via HTML Accessibility Tree}.
+arXiv:2507.14799, 2025.
+\url{https://arxiv.org/abs/2507.14799}
+
+\bibitem{imperceptibleJailbreak2025}
+K. Gao, Y. Li, C. Du, X. Wang, X. Ma, S.-T. Xia, and T. Pang.
+\emph{Imperceptible Jailbreaking against Large Language Models}.
+arXiv:2510.05025, 2025.
+\url{https://arxiv.org/abs/2510.05025}
+
+\bibitem{emojiJailbreak2026}
+M. P. V. S. Gopinadh and S. M. Hussain.
+\emph{Emoji-Based Jailbreaking of Large Language Models}.
+arXiv:2601.00936, 2026.
+\url{https://arxiv.org/abs/2601.00936}
+
+\bibitem{wasp2025}
+I. Evtimov et al.
+\emph{WASP: Benchmarking Web Agent Security Against Prompt Injection Attacks}.
+arXiv:2504.18575, 2025.
+\url{https://arxiv.org/abs/2504.18575}
+
+\bibitem{agentDojo2024}
+E. Debenedetti, J. Zhang, M. Balunovic, L. Beurer-Kellner, M. Fischer, and F. Tram\`er.
+\emph{AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents}.
+arXiv:2406.13352, 2024.
+\url{https://arxiv.org/abs/2406.13352}
+
+\bibitem{signedPrompt2024}
+X. Suo.
+\emph{Signed-Prompt: A New Approach to Prevent Prompt Injection Attacks Against LLM-Integrated Applications}.
+arXiv:2401.07612, 2024.
+\url{https://arxiv.org/abs/2401.07612}
+
+\bibitem{openaiCodexSystemCard2025}
+OpenAI.
+\emph{Addendum to o3 and o4-mini system card: Codex}.
+2025.
+\url{https://cdn.openai.com/pdf/8df7697b-c1b2-4222-be00-1fd3298f351d/codex_system_card.pdf}
+
+\bibitem{unit42Memory2025}
+Palo Alto Networks Unit 42.
+\emph{When AI Remembers Too Much: Persistent Behaviors in Agents' Memory}.
+2025.
+\url{https://unit42.paloaltonetworks.com/indirect-prompt-injection-poisons-ai-longterm-memory/}
+
+\bibitem{mcpSecurity}
+Model Context Protocol.
+\emph{Security Best Practices}.
+\url{https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices}
+
+\bibitem{agentBenchRepo}
+I. Shust.
+\emph{agent-bench: Agent Security Research Testbed}.
+GitHub repository, 2026.
+\url{https://github.com/awerks/agent-bench}
+
+\bibitem{youtubeInspiration}
+\emph{Inspiration source (YouTube)}.
+\url{https://youtu.be/Plzp5z5RsJw}
+
+\end{thebibliography}
+
 \end{document}
