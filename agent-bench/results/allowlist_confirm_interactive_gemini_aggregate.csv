@@ -1,0 +1,4 @@
+adversarial_runs,asr_percent,avg_latency_seconds,avg_user_steps,benign_runs,btsr_percent,defense_profile,false_negative_rate,false_positive_rate,permission_profile,runs
+2,0.0,4.5059,0.0,0,0.0,allowlist_confirm,0.0,0.0,P2,2
+1,0.0,10.1659,1.0,0,0.0,allowlist_confirm,0.0,0.0,P3,1
+1,0.0,19.4071,1.0,0,0.0,allowlist_confirm,0.0,0.0,P4,1
