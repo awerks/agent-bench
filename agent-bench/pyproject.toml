@@ -17,6 +17,7 @@ dependencies = [
 
 [project.scripts]
 asr-agent = "agent.cli:main"
+asr-thesis-artifacts = "eval.thesis_artifacts:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

@@ -1,4 +1,3 @@
-results/traces/*.jsonl
 results/summary_tables.csv
 results/aggregate.csv
 data/sandbox/*
