@@ -3,7 +3,6 @@ Minimal ReAct-style CLI agent. The agent can run manually or from JSONL benchmar
 ## Setup
 
 ```bash
-cd agent-security-research
 python3 -m pip install -e .
 ```
 
