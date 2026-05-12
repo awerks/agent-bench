@@ -103,8 +103,6 @@
   \draw[flowArrow] (agent) -- node[stepDot, fill=appOrange, pos=0.50] {5} (tool);
   \draw[attackArrow] (tool.west) -- node[stepDot, fill=attackerRed, pos=0.53] {6} (attacker.east);
 
-  \node[flowNote, anchor=north west] at (-0.35,0.05)
-    {\textbf{Boundary to enforce}\\#7};
 \end{tikzpicture}}
 
 \newcommand{\promptdatabox}[3]{%
@@ -264,12 +262,9 @@ Date, Signature
 Increasingly, Large language model (LLM) systems occupy roles as agents that perform
 more than question-answering. They read documents, browse websites, call tools, modify files,
 and interact via enterprise APIs. This changes the security problem; to be useful, the agent must
-have extended permissions, e.g read untrusted websites, email, documents, tool output, and memory. The relatively new threat of prompt injection arises from the LLM's failure to cleanly sep-
-arate trusted instructions from attacker-controlled text. When it fails, the model extracts sen-
-sitive information, misuses enterprise or tool resources, or even acts as an adversary over multi-
-step interactions. We study the attack surface of these high-permission LLM agents and how
+have extended permissions, e.g read untrusted websites, email, documents, tool output, and memory. The relatively new threat of prompt injection arises from the LLM's failure to cleanly separate trusted instructions from attacker-controlled text. When it fails, the model extracts sensitive information, misuses enterprise or tool resources, or even acts as an adversary over multi-step interactions. We study the attack surface of these high-permission LLM agents and how
 both permission design and defense-in-depth impact the tradeoff between utility and security.
-We adapt and verify the results of the ReAct methodology for analyzing the security of text-based
+We adapt a ReAct-style agent for analyzing the security of text-based
 agents, specifying the test environment for reproduction, and conducting new experiments to
 explore the mitigation space.
 
@@ -711,7 +706,7 @@ This model supports RQ2 by letting the same attack payload be evaluated under di
 \section{Design Goals}
 
 
-The implemented testbed, which can be found in the \texttt{agent-bench} repository  \cite{agentBenchRepo}, is small enough to be reproduced but realistic enough to  stress the security properties of high-permission agents. It supports repeatable tasks, configurable permissions, mock sensitive data, controlled adversarial fixtures, layered defenses, and trace logging. The goal is not to build the most capable possible agent. The goal is to build an environment where agent security can be evaluated in a controlled way.
+The implemented testbed, which can be found in the \texttt{agent-bench} repository  \cite{agentBenchRepo}, is small enough to be reproduced but realistic enough to  stress the security properties of high-permission agents. It supports repeatable tasks, configurable permissions, mock sensitive data, controlled adversarial fixtures, layered defenses, and trace logging.
 \section{Architecture}
 
 The agent makes use of a ReAct style loop with a Gemini planner. Its components are as follows
