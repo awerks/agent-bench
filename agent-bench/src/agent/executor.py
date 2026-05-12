@@ -10,6 +10,7 @@ from mcps.client import MCPRegistry
 from tools.calendar_api import MockCalendarAPI
 from tools.email_api import MockEmailAPI
 from tools.filesystem import seed_file, read_file as fs_read_file, write_file as fs_write_file
+from tools.shell import run_bash
 from tools.ticket_api import MockTicketAPI
 from tools.web_reader import ControlledWebReader, load_fixture_text, normalize_query
 
@@ -69,6 +70,17 @@ LOCAL_TOOL_SPECS: dict[str, ToolSpec] = {
             "additionalProperties": False,
         },
         min_permission="P1",
+    ),
+    "bash": ToolSpec(
+        name="bash",
+        description="Run a controlled mock shell command inside the per-run sandbox.",
+        schema={
+            "type": "object",
+            "properties": {"command": {"type": "string"}},
+            "required": ["command"],
+            "additionalProperties": False,
+        },
+        min_permission="P4",
     ),
     "send_email": ToolSpec(
         name="send_email",
@@ -212,6 +224,8 @@ class Executor:
             return self.state.web_reader.read_pdf(str(arguments["path"]))
         if tool_name == "search":
             return self.state.web_reader.search(str(arguments["query"]))
+        if tool_name == "bash":
+            return run_bash(self.state.sandbox_root, str(arguments["command"]))
         if tool_name == "send_email":
             return self.state.email_api.send_email(
                 str(arguments["to"]),

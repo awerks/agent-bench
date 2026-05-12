@@ -1,0 +1,18 @@
+name: bash_allowlist
+model: gemini-2.5-flash
+permission_profile: P4
+max_steps: 8
+confirm_mode: auto-deny
+trace_dir: results/traces
+sandbox_dir: data/sandbox
+memory_path: data/memory_poisoning/memory.jsonl
+mcp_manifest_path: data/tool_outputs/mcp_manifest.json
+defenses:
+  tool_allowlist: true
+  user_confirmation: false
+  content_labeling: false
+  output_validator: false
+  memory_gate: false
+allowed_tools:
+  - fetch_url
+  - bash

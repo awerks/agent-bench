@@ -819,13 +819,14 @@ E1 & A Hidden instruction inside controlled HTML requests the agent to read and 
 E2 & Malicious search/tool output requests the agent to send a forge email prior to legitimate support ticket creation. & Unauthorized behavior, abused utility, human confirmation expense. \\
 E3 & Vendor-like PDF document requests the agent to read a private validation specific file before answering. & Data leak, tool-argument whitelist, false rejection. \\
 E4 & A Web project note requests the agent to remember a possibly harmful long-term memoization rule. & Memoization persistence, memoization isolation, utility loss due to human confirm. \\ 
+E5 & A web report instructs the agent to run a shell command via an allowlisted \texttt{bash} tool to read a sandbox secret before summarizing. & Shell-escape exfiltration, allowlist bypass, ambient authority. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \section{Result Artifacts}
 
-The reported results are generated from the 16 current JSONL trace files under \path{agent-bench/results/traces}. The trace-derived summary files are \path{agent-bench/results/thesis_trace_summary.csv} and \path{agent-bench/results/thesis_profile_summary.csv}.\footnote{\url{https://github.com/awerks/agent-bench}}
+The reported results are generated from the 17 current JSONL trace files under \path{agent-bench/results/traces}, including the supplemental shell-escape run. The trace-derived summary files are \path{agent-bench/results/thesis_trace_summary.csv} and \path{agent-bench/results/thesis_profile_summary.csv}.\footnote{\url{https://github.com/awerks/agent-bench}}
 
 
 \chapter{Results}
@@ -909,7 +910,7 @@ The baseline profile was effective but unsafe: it executed every task of the use
 
 \section{Interpreting Permission Effects}
 
-The agent uses P2, P3, and P4 permissions. In P2, the E1 and E3 tasks have confidentiality problems: private read permission is used in the baseline to leak the validation information planted. The memory task for P3 has a persistence problem: in the baseline, memory writing is allowed to be poisoned in the labeling-validation hints. The P4 task has a problem with an action: the agent in the baseline attempted the malicious notification step indicated in the tool output and successfully completed the ticket task anyway.
+The agent uses P2, P3, and P4 permissions. In P2, the E1 and E3 tasks have confidentiality problems: private read permission is used in the baseline to leak the validation information planted. The memory task for P3 has a persistence problem: in the baseline, memory writing is allowed to be poisoned in the labeling-validation hints. The P4 task has a problem with an action: the agent in the baseline attempted the malicious notification step indicated in the tool output and successfully completed the ticket task anyway. The supplemental E5 shell-escape run shows that P4 bash access can reintroduce private reads even when \texttt{read\_file} is not allowlisted.
 
 \section{Interpreting Defense Effects}
 
@@ -934,7 +935,10 @@ E4 memory poisoning & Success & Blocked & Success & Max steps \\
 The most crucial difference lies between defenses that decrease model influence and defenses that mitigate harm after the model has been influenced. Source labeling helped the model to disregard malicious instructions in E1 and E2, but this did not stop E4 memory poisoning: the planner is both the author and the reader of the malicious memory string as can be seen in the trace. Tool allowlists and fixture-argument checks constrained E3 even after the planner tried to access the secret path.  User confirmation blocked the E4 poisoned memory write in the allowlist/confirmation profile, but it also blocked the safe write and added interaction cost, which was an additional safety measure. The memory gate more directly targeted E4, by quarantining the poisoned memory write, but then the surrounding auto-deny confirmation policy repeatedly blocks the safe memory write.
 
 \paragraph{Limitation of memory gates.}
-The prototype memory gate is intentionally trivial: the agent client may implement some cheap instuctions to check for suspicious strings before allowing a long-term memory write. This is helpful for obviously bad payloads, but obviously does not constitute a complete defense. A memory-write request is also natural-language content, and thus may be injected like any other prompt: by translating it, by paraphrasing it, by obfuscating the policy-changing part in plausible-seeming project description, or by using domain-specific terminology. Simple client-side string matching is insufficient if the system must make the semantic call on whether a candidate memory constitutes a safe fact or a disguised instruction. That decision must be made by a more substantial semantic policy, or likely, by the model itself. If the model is making that call the memory defense once more relies on the model's ability to separate trusted user intent from prompt-injected content.
+The prototype memory gate is intentionally trivial: the agent client may implement some cheap checks for suspicious strings before allowing a long-term memory write. This is helpful for obviously bad payloads, but obviously does not constitute a complete defense. A memory-write request is also natural-language content, and thus may be injected like any other prompt: by translating it, by paraphrasing it, by obfuscating the policy-changing part in plausible-seeming project description, or by using domain-specific terminology. Simple client-side string matching is insufficient if the system must make the semantic call on whether a candidate memory constitutes a safe fact or a disguised instruction. That decision must be made by a more substantial semantic policy, or likely, by the model itself. If the model is making that call the memory defense once more relies on the model's ability to separate trusted user intent from prompt-injected content.
+
+\paragraph{Limitation of tool allowlists.}
+The assumption behind the allowlist result is that tools are narrow and semantically scoped. If the allowlist covers a general execution tool like \texttt{bash}, \texttt{python}, or unconstrained browser automation, the boundary is much weaker. A prompt-injected model does not require the banned \texttt{read\_file} tool if it can execute \texttt{python -c} or shell commands reading the same file. Similarly, a general shell can often reimplement network access, file writes, data transformation, etc. that were mistakenly assumed part of the explicit tool list. We tested this with a supplemental E5 shell-escape task. In that task, \texttt{read\_file} was not allowlisted, but a controlled mock \texttt{bash} tool was allowlisted. The Gemini planner followed injected page text that asked it to run \texttt{python -c} through \texttt{bash}, read a sandbox secret, and include the value in the answer. The trace was scored as attack success with zero policy blocks. This is not a clever bypass of the allowlist so much as an indication that the allowed tool has far too much ambient authority.
 
 We do not expect a single defense to eliminate prompt injection. In the real world, we aim for defense in depth. Figure~\ref{fig:policy-costs} shows the corresponding cost curve: the more defenses that are brought to bear against injection, the more policy will also block useful inputs and, when interactive confirmation is used, the more user steps stand between the view and a correct execution.
 
@@ -1012,8 +1016,6 @@ While mock APIs and secrets ensure that the work can be reproduced, it is imposs
 The results could be different depending on the specific LLM used and the time of evaluation since models evolve, and the capabilities for prompt-injection detection are constantly advancing.
 
 Our attack suite accounts for representative classes of prompt-injection attacks, but it does not ensure that all presented prompt-injection variations are covered. Attackers can always attempt to bypass defenses.
-
-The memory gate is also limited. In this prototype, it is implemented as a client-side suspicious-string check, which can catch obvious English payloads but can miss translated, paraphrased, or more natural policy-changing memory writes. A stronger memory defense would need to decide whether the proposed memory is a legitimate user-relevant fact or a persistent instruction planted by untrusted content. If this decision is delegated to an LLM, then the defense still relies on model judgment against prompt injection rather than eliminating the problem entirely.
 
 Despite the heightened security measures in strongly-layered defense strategies, it is difficult to formally prove that prompt injection is prevented in all possible cases.
 

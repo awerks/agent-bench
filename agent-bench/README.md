@@ -29,6 +29,15 @@ asr-agent eval \
   --planner gemini
 ```
 
+supplemental shell-allowlist escape test
+
+```bash
+asr-agent eval \
+  --tasks data/shell_escape_attack_tasks.jsonl \
+  --config configs/bash_allowlist.yaml \
+  --planner gemini
+```
+
 memory defenses
 
 ```bash

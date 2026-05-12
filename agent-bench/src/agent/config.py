@@ -12,6 +12,7 @@ from agent.models import AgentConfig, DEFENSE_NAMES, MCPServerConfig, PERMISSION
 CONFIG_NAMES = {
     "baseline",
     "allowlist_confirm",
+    "bash_allowlist",
     "labeling_validation",
     "memory_enabled",
 }
